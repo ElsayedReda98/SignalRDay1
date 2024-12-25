@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Chat</h1>
+
+<div>
+    <input type="text" id="txt" />
+    <input type="button" value="send" />
+
+    <ul id="chatul">
+    </ul>
+</div>
+
+@section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script type="text/javascript">
+       var userName = prompt("Enter name");
+
+        // steps
+
+        // 1. create a connection
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+        
+        // 2. start connection
+        connection.start();
+
+        // 3. register a method
+        connection.on("newMessage", function (user, message) {
+            var li = document.createElement("li");
+            li.textContent = user + " : " + message;
+            document.getElementById("chatul").appendChild(li);
+        });
+
+        // 4. send message
+        document.querySelector("input[type=button]").addEventListener("click", function () {
+            var txt = document.getElementById("txt");
+             connection.invoke("SendMessage", userName, txt.value);
+            txt.value = "";
+        });
+
+    </script>
+}
